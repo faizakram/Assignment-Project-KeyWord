@@ -1,6 +1,6 @@
 # Assignment-Project-KeyWord Click here watch the video
 
-[![Assignment](https://cdn.dribbble.com/users/1696785/screenshots/3941625/youtube-loading-animation.gif)](https://www.youtube.com/watch?v=GywyjzVDliY)
+[![Assignment](https://media.giphy.com/media/13Nc3xlO1kGg3S/giphy.gif)](https://www.youtube.com/watch?v=GywyjzVDliY)
 
 
 
