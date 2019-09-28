@@ -1,6 +1,6 @@
 # Assignment-Project-KeyWord
 
-[![Assignment](https://s20352.pcdn.co/wp-content/uploads/2018/03/2000px-YouTube_social_white_square_2017.svg_-1-1024x778.png)](https://www.youtube.com/watch?v=GywyjzVDliY)
+[![Assignment](https://cdn.dribbble.com/users/1696785/screenshots/3941625/youtube-loading-animation.gif)](https://www.youtube.com/watch?v=GywyjzVDliY)
 
 
 
