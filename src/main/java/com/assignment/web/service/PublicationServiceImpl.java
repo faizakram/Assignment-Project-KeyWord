@@ -3,7 +3,9 @@ package com.assignment.web.service;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,7 +59,9 @@ public class PublicationServiceImpl implements PublicationService {
 	 */
 	@Override
 	public Long addPublication(PublicationDTO publicationDTO) {
-		return addOrUpdatePublication(new Publication(), publicationDTO);
+		Publication publication = new Publication();
+		publication.setPublicationAuthors(new ArrayList<>());
+		return addOrUpdatePublication(publication, publicationDTO);
 	}
 
 	/**
@@ -68,16 +72,7 @@ public class PublicationServiceImpl implements PublicationService {
 	 * @return
 	 */
 	private Long addOrUpdatePublication(Publication publication, PublicationDTO publicationDTO) {
-		if (CollectionUtils.isEmpty(publicationDTO.getAuthors())
-				&& publicationDTO.getAuthors().stream().anyMatch(f -> f.getId() == null && f.getId() <= 0)) {
-			ErrorInfo errorInfo = errorCodeHelper.getErrorInfo(CommonConstant.E1007_ERROR_CODE,
-					CommonConstant.E1007_ERROR_DESCRIPTION);
-			throw new ServiceException(errorInfo, HttpStatus.NOT_FOUND);
-		}
-		Set<Long> authorsIds = publicationDTO.getAuthors().stream().map(CommonDTO::getId).collect(Collectors.toSet());
-		List<Author> authors = authorRepository.findAllById(authorsIds);
-		publication.setPublicationAuthors(new ArrayList<>());
-		authors.forEach(author -> publication.addPublicationAuthor(new PublicationAuthor(author, publication)));
+		addOrUpdateAuthors(publication, publicationDTO);
 		publication.setPublicationEnum(getEnumItem(publicationDTO.getPublicationEnumId()));
 		publication.setTitle(publicationDTO.getTitle());
 		publication.setYear(setPublicationYear(publicationDTO.getYear()));
@@ -99,6 +94,40 @@ public class PublicationServiceImpl implements PublicationService {
 			throw new ServiceException(errorInfo, HttpStatus.NOT_FOUND);
 		}
 		return publicationRepository.save(publication).getId();
+	}
+
+	/**
+	 * addOrUpdateAuthors
+	 * 
+	 * @param publication
+	 * @param publicationDTO
+	 */
+	private void addOrUpdateAuthors(Publication publication, PublicationDTO publicationDTO) {
+		if (CollectionUtils.isEmpty(publicationDTO.getAuthors())
+				&& publicationDTO.getAuthors().stream().anyMatch(f -> f.getId() == null && f.getId() <= 0)) {
+			ErrorInfo errorInfo = errorCodeHelper.getErrorInfo(CommonConstant.E1007_ERROR_CODE,
+					CommonConstant.E1007_ERROR_DESCRIPTION);
+			throw new ServiceException(errorInfo, HttpStatus.NOT_FOUND);
+		}
+		Map<Long, PublicationAuthor> map = new HashMap<>();
+		publication.getPublicationAuthors().forEach(pa -> {
+			map.put(pa.getAuthor().getId(), pa);
+			pa.setDeleted(true);
+		});
+		Set<Long> authorsIds = publicationDTO.getAuthors().stream().map(CommonDTO::getId).collect(Collectors.toSet());
+		List<Author> authors = authorRepository.findAllById(authorsIds);
+		authors.forEach(author -> {
+			PublicationAuthor publicationAuth = map.get(author.getId());
+			if (publicationAuth != null)
+				publicationAuth.setDeleted(false);
+			else {
+				publicationAuth = new PublicationAuthor();
+				publicationAuth.setAuthor(author);
+				publicationAuth.setPublication(publication);
+				publication.addPublicationAuthor(publicationAuth);
+			}
+		});
+
 	}
 
 	/**
@@ -144,6 +173,7 @@ public class PublicationServiceImpl implements PublicationService {
 	/**
 	 * 
 	 * @param id
+	 * @param isUpdate
 	 * @return
 	 */
 	private Publication getPublicationById(Long id) {
@@ -193,7 +223,7 @@ public class PublicationServiceImpl implements PublicationService {
 	 */
 	private PublicationDTO setPublicationDTO(Publication publication, PublicationDTO publicationDTO) {
 		publicationDTO.setId(publication.getId());
-		publicationDTO.setAuthors(publication.getPublicationAuthors().stream()
+		publicationDTO.setAuthors(publication.getPublicationAuthors().stream().filter(f->!f.isDeleted())
 				.map(m -> new CommonDTO(m.getAuthor().getId(), m.getAuthor().getName())).collect(Collectors.toList()));
 		publicationDTO.setTitle(publication.getTitle());
 		publicationDTO.setYear(DateUtils.convertDateToString(CommonConstant.DATE_FORMAT_YYYY, publication.getYear()));
@@ -214,7 +244,7 @@ public class PublicationServiceImpl implements PublicationService {
 	 */
 	@Override
 	public Long delete(Long id) {
-		 publicationRepository.deleteById(id);
+		publicationRepository.deleteById(id);
 		return id;
 	}
 

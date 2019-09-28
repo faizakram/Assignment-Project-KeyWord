@@ -9,4 +9,6 @@ public interface SearchDAO {
 
 	List<Publication> searchPublications(SearchDTO searchDTO);
 
+	Publication save(Publication publication);
+
 }

@@ -5,8 +5,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +20,7 @@ import com.assignment.web.utils.CommonConstant;
  *
  */
 @RestController
-@RequestMapping(CommonConstant.AUTH_URL)
+@RequestMapping(CommonConstant.ENUM_URL)
 public class EnumController {
 
 	@Autowired
@@ -36,13 +36,14 @@ public class EnumController {
 	 * @param id
 	 * @return
 	 */
-	@PostMapping(CommonConstant.COMMON_ID)
+	@GetMapping(CommonConstant.COMMON_ID)
 	public ResponseJson getEnumItem(@PathVariable EnumItemDTO id) {
 		response.setResponseDescription(CommonConstant.S0002_SUCCESS_DESCRIPTION);
 		model.put(CommonConstant.RESULTS, enumItemService.getEnumItem(id));
 		response.setResponse(model);
 		return response;
 	}
+	
 
 
 }

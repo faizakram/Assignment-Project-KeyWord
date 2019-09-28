@@ -29,7 +29,9 @@ public class PublicationAuthor implements Serializable {
 	@Column(unique=true, nullable=false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-
+	@Column(name="is_deleted")
+	private boolean isDeleted;
+	
 	//bi-directional many-to-one association to Author
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="author_id", nullable=false)
@@ -71,6 +73,14 @@ public class PublicationAuthor implements Serializable {
 
 	public void setPublication(Publication publication) {
 		this.publication = publication;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 }

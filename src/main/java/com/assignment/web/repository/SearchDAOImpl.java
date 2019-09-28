@@ -73,7 +73,7 @@ public class SearchDAOImpl implements SearchDAO {
 	 * @return
 	 */
 	private String queryBuilder(SearchDTO searchDTO) {
-		StringBuilder queryBuilder = new StringBuilder("select p from Publication p where 0=0");
+		StringBuilder queryBuilder = new StringBuilder("select p from Publication p join p.publicationAuthors pa where pa.isDeleted=0");
 		if (searchDTO.getBookEnumId() != null) {
 			queryBuilder.append(" and p.bookEnum.id =:param1");
 		}
@@ -84,9 +84,9 @@ public class SearchDAOImpl implements SearchDAO {
 			queryBuilder.append(" and p.publicationEnum.id =:param3");
 		}
 		if (!StringUtils.isEmpty(searchDTO.getAuthorName())) {
-			queryBuilder.append(" and p.author.name like:param4");
+			queryBuilder.append(" and pa.author.name like:param4");
 		} else if (searchDTO.getAuthorId() != null) {
-			queryBuilder.append(" and p.author.id =:param4");
+			queryBuilder.append(" and pa.author.id =:param4");
 		}
 		if (!StringUtils.isEmpty(searchDTO.getYear())) {
 			queryBuilder.append(" and p.year =:param5");
@@ -100,4 +100,7 @@ public class SearchDAOImpl implements SearchDAO {
 		return queryBuilder.toString();
 	}
 
+	public Publication save(Publication publication) {
+		return entityManager.merge(publication);
+	}
 }
