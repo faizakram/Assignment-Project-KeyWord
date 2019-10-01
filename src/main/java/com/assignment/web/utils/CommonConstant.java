@@ -72,4 +72,5 @@ public class CommonConstant {
 	public static final String S0006_SUCCESS_DESCRIPTION = "SM-HTTP_DESCRIPTION-S0006";
 	public static final String S0007_SUCCESS_DESCRIPTION = "SM-HTTP_DESCRIPTION-S0007";
 	public static final String SLASH = "/";
+	public static final String S3_BUCKET_OBJECT = "s3Object";
 }

@@ -3,6 +3,7 @@ package com.assignment.web;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -12,6 +13,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.assignment.web.utils.CommonConstant;
 
 import springfox.documentation.builders.PathSelectors;
@@ -19,6 +24,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 /**
  * 
  * Configuration Class
@@ -28,9 +34,19 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @PropertySource({ CommonConstant.SUCCESS_PROPERTIES })
 public class AppConfig implements WebMvcConfigurer {
-	
+
+	@Value("${cloud.aws.credentials.accessKey}")
+	private String accessKey;
+
+	@Value("${cloud.aws.credentials.secretKey}")
+	private String secretkey;
+
+	@Value("${cloud.aws.region.static}")
+	private String regions;
+
 	/**
 	 * Swagger Configuration
+	 * 
 	 * @return
 	 */
 	@Bean
@@ -48,7 +64,8 @@ public class AppConfig implements WebMvcConfigurer {
 	}
 
 	/**
-	 * Creating Beans @Scope as Request 
+	 * Creating Beans @Scope as Request
+	 * 
 	 * @return
 	 */
 	@Bean(name = CommonConstant.COMMON_MAP_OBJECT)
@@ -56,4 +73,15 @@ public class AppConfig implements WebMvcConfigurer {
 	public Map<String, Object> getMapObject() {
 		return new HashMap<>();
 	}
+
+	/**
+	 * Bucket Creation
+	 */
+	@Bean(name = CommonConstant.S3_BUCKET_OBJECT)
+	public AmazonS3 getAmazonS3() {
+		return AmazonS3ClientBuilder.standard()
+				.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretkey)))
+				.withRegion(regions).build();
+	}
+
 }
