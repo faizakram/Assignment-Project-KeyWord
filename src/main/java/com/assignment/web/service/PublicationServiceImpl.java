@@ -104,7 +104,7 @@ public class PublicationServiceImpl implements PublicationService {
 	 */
 	private void addOrUpdateAuthors(Publication publication, PublicationDTO publicationDTO) {
 		if (CollectionUtils.isEmpty(publicationDTO.getAuthors())
-				&& publicationDTO.getAuthors().stream().anyMatch(f -> f.getId() == null && f.getId() <= 0)) {
+				|| publicationDTO.getAuthors().stream().anyMatch(f -> f.getId() <= 0)) {
 			ErrorInfo errorInfo = errorCodeHelper.getErrorInfo(CommonConstant.E1007_ERROR_CODE,
 					CommonConstant.E1007_ERROR_DESCRIPTION);
 			throw new ServiceException(errorInfo, HttpStatus.NOT_FOUND);
